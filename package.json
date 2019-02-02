@@ -1,0 +1,17 @@
+{
+  "name": "makerplayground",
+  "version": "1.0.0",
+  "description": "makerplaygound runtime on raspberry pi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "express-fileupload": "^1.1.1-alpha.1",
+    "rimraf": "^2.6.3",
+    "unzipper": "^0.9.10"
+  }
+}

@@ -1,0 +1,15 @@
+[Unit]
+Description=Maker Playground Runtime - easy to deploy IoT project
+Documentation=https://makerplayground.io
+After=network.target
+
+[Service]
+Environment=
+Type=simple
+User=root
+ExecStart=/usr/bin/node /home/pi/makerplayground-rpi/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
