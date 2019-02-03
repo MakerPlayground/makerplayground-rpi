@@ -10,6 +10,9 @@ echo "installing node_modules"
 npm install
 echo "done"
 
+echo "registering pigpiod service"
+systemctl enable pigpiod
+echo "done"
 
 echo "registering makerplayground service"
 cp makerplayground.service /lib/systemd/system/makerplayground.service
