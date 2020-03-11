@@ -54,7 +54,8 @@ app.get('/', (req, res) => {
 
 app.post('/upload', (req, res) => {
     if (Object.keys(req.files).length == 0 || !req.files.script) {
-        res.status(400).send('No files were uploaded.')
+        console.log("No file were uploaded")
+        return res.status(400).send('No files were uploaded.')
     }
 
     let extractor = unzipper.Extract({path: __dirname})
@@ -66,15 +67,22 @@ app.post('/upload', (req, res) => {
         rimraf(scriptZipFile, () => {})
     })
     .on('error', (err) => {
-        if (err) return res.status(500).send(err)
+        if (err) {
+            console.log(err)
+            return res.status(500).send(err)
+        }
     })
 
     req.files.script.mv(scriptZipFile, (err) => {
-        if (err) return res.status(500).send(err)
-        rimraf(scriptDir, () => {
-            fs.createReadStream(scriptZipFile)
-               .pipe(extractor)
-        })
+        if (err) {
+             console.log(err)
+             return res.status(500).send(err)
+        } else {
+            rimraf(scriptDir, () => {
+                fs.createReadStream(scriptZipFile)
+                   .pipe(extractor)
+            })
+        }
     })
 })
 
