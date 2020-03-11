@@ -1,4 +1,5 @@
 const child_process = require('child_process')
+const process = require('process')
 const fs = require('fs')
 const rimraf = require('rimraf')
 const unzipper = require('unzipper')
@@ -13,6 +14,10 @@ const scriptZipFile = __dirname + '/script.zip'
 
 var proc = null
 var running = false
+
+process.on('exit', function() {
+    stopScript()
+})
 
 function stopScript() {
     if (running) {
