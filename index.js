@@ -22,6 +22,7 @@ process.on('exit', function() {
 function stopScript() {
     if (running) {
         proc.kill('SIGINT')
+        console.log(`Send interrupt signal to process: ${proc.pid}`)
         running = false
     }
 }
@@ -29,15 +30,13 @@ function stopScript() {
 function runScript() {
     if (fs.existsSync(scriptEntryFile) && !running) {
         proc = child_process.spawn('python3', [scriptEntryFile])
+        console.log(`run the script on process: ${proc.pid}`)
         running = true
         proc.stdout.on('data', (data) => {
             console.log(`${data}`)
         })
         proc.stderr.on('data', (data) => {
             console.log(`${data}`)
-        })
-        proc.on('close', (retVal) => {
-            console.log(`${retVal}`)
         })
     }
 }
@@ -53,32 +52,42 @@ app.get('/', (req, res) => {
 })
 
 app.post('/upload', (req, res) => {
+    console.log("======== New script is just uploading ==========")
     if (Object.keys(req.files).length == 0 || !req.files.script) {
-        console.log("No file were uploaded")
+        console.error("No file were uploaded")
         return res.status(400).send('No files were uploaded.')
     }
 
     let extractor = unzipper.Extract({path: __dirname})
     .on('close', () => {
+        console.log("done extracting zip file")
+        proc.on('exit', (code) => {
+            console.log(`process: ${proc.pid} is now exited`)
+            runScript()
+            res.send('File uploaded!')
+        })
         stopScript()
-        runScript()
-        console.log(proc.pid)
-        res.send('File uploaded!')
-        rimraf(scriptZipFile, () => {})
+        console.log("remove zip file")
+        rimraf(scriptZipFile, () => { console.log("done removing zip file") })
     })
     .on('error', (err) => {
         if (err) {
-            console.log(err)
+            console.error(err)
             return res.status(500).send(err)
         }
     })
 
+    console.log("copy zip file to the running directory")
     req.files.script.mv(scriptZipFile, (err) => {
         if (err) {
-             console.log(err)
+             console.error(err)
              return res.status(500).send(err)
         } else {
+            console.log("done copy zip file")
+            console.log("delete previous script folder")
             rimraf(scriptDir, () => {
+                console.log("done delete previous script folder")
+                console.log("start extracting zip file")
                 fs.createReadStream(scriptZipFile)
                    .pipe(extractor)
             })
@@ -86,5 +95,5 @@ app.post('/upload', (req, res) => {
     })
 })
 
-app.listen(port, () => console.log(`listening on port ${port}`))
+app.listen(port, () => console.log(`listening MakerPlayground upload on port ${port}`))
 
