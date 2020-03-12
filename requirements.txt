@@ -1,3 +1,2 @@
-netifaces==0.10.9
 websockets==8.1
 Adafruit-DHT==1.4.0
