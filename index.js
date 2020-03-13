@@ -62,17 +62,18 @@ app.post('/upload', (req, res) => {
     let extractor = unzipper.Extract({path: __dirname})
     .on('close', () => {
         console.log("done extracting zip file")
-        res.send('File uploaded')
+//        res.send('File uploaded')
         if (proc && running) {
             proc.on('exit', (code) => {
                 running = false
-                console.log(`process: ${proc.pid} is now exited`)
+                console.log(`process: ${proc.pid} is now exited with status code {code}`)
                 runScript()
-                res.send('File uploaded!')
+                res.send('File uploaded')
             })
             stopScript()
         } else {
             runScript()
+            res.send('File uploaded')
         }
         console.log("remove zip file")
         rimraf(scriptZipFile, () => { console.log("done removing zip file") })
