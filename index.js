@@ -38,6 +38,7 @@ function runScript() {
         proc.stderr.on('data', (data) => {
             console.log(`${data}`)
         })
+        proc.on('exit', () => { running = false })
     }
 }
 
@@ -61,12 +62,18 @@ app.post('/upload', (req, res) => {
     let extractor = unzipper.Extract({path: __dirname})
     .on('close', () => {
         console.log("done extracting zip file")
-        proc.on('exit', (code) => {
-            console.log(`process: ${proc.pid} is now exited`)
+        res.send('File uploaded')
+        if (proc && running) {
+            proc.on('exit', (code) => {
+                running = false
+                console.log(`process: ${proc.pid} is now exited`)
+                runScript()
+                res.send('File uploaded!')
+            })
+            stopScript()
+        } else {
             runScript()
-            res.send('File uploaded!')
-        })
-        stopScript()
+        }
         console.log("remove zip file")
         rimraf(scriptZipFile, () => { console.log("done removing zip file") })
     })
