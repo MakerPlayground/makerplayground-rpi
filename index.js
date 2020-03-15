@@ -66,7 +66,7 @@ app.post('/upload', (req, res) => {
         if (proc && running) {
             proc.on('exit', (code) => {
                 running = false
-                console.log(`process: ${proc.pid} is now exited with status code {code}`)
+                console.log(`process: ${proc.pid} is now exited with status code ${code}`)
                 runScript()
                 res.send('File uploaded')
             })
